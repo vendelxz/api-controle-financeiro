@@ -10,14 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
 
-    List<Transacao> findByUsuario(UUID idUsuario);
+    List<Transacao> findByidUsuario(UUID idUsuario);
 
     List<Transacao> findByIdUsuarioAndDataTransacaoBetween (UUID idUsuario, LocalDate dataInicio, LocalDate dataFim);
 

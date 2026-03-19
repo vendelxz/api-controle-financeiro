@@ -35,3 +35,4 @@ build/
 ##Segredos
 /src/main/resources/application.properties
 application.properties
+*.db

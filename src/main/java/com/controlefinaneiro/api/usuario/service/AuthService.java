@@ -27,7 +27,7 @@ public class AuthService {
 
     public UsuarioResponseDTO registrar(UsuarioDTO dto){
         if(usuarioRepository.existsByEmail(dto.email())){
-            throw new RuntimeException("Email em uso, tente outro por favor.");
+            throw new IllegalArgumentException("Email em uso, tente outro por favor.");
         }
 
         String senhaHash = passwordEncoder.encode(dto.senha());
@@ -42,11 +42,11 @@ public class AuthService {
     public String autenticar(LoginDTO login){
         Usuario usuario = usuarioRepository.findByEmail(login.email());
         if(usuario == null){
-            throw new RuntimeException("Erro de autenticação.");
+            throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
         if(!passwordEncoder.matches(login.senha(), usuario.getSenha())){
-            throw new RuntimeException("E-mail ou senha incorretos.");
+            throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
         String token = tokenService.gerarToken(usuario);
