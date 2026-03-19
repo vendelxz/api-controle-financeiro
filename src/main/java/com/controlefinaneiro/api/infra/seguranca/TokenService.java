@@ -15,7 +15,7 @@ import com.controlefinaneiro.api.usuario.models.Usuario;
 @Service
 public class TokenService {
 
-    @Value("$token.secret")
+    @Value("${token.secret}")
     private String secret;
 
     public String gerarToken(Usuario usuario){
