@@ -6,6 +6,8 @@ import com.controlefinaneiro.api.transacao.enums.TipoTransacao;
 import com.controlefinaneiro.api.transacao.mapper.TransacaoMapper;
 import com.controlefinaneiro.api.transacao.models.Transacao;
 import com.controlefinaneiro.api.transacao.repository.TransacaoRepository;
+import com.controlefinaneiro.api.usuario.models.Usuario;
+import com.controlefinaneiro.api.usuario.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,14 +26,19 @@ public class TransacaoService {
     private TransacaoRepository transacaoRepository;
 
     @Autowired
+    private AuthService authService;
+
+    @Autowired
     private TransacaoMapper transacaoMapper;
 
 
     @Transactional
     public TransacaoDTO criar(TransacaoDTO transacaoDTO) {
+        Usuario usuarioLogado = authService.getUsuarioAutenticado();
         validarTransacaoCompleta(transacaoDTO);
 
         Transacao transacao = transacaoMapper.toEntity(transacaoDTO);
+        transacao.setIdUsuario(usuarioLogado.getId());
         Transacao salva = transacaoRepository.save(transacao);
 
         return transacaoMapper.toDTO(salva);

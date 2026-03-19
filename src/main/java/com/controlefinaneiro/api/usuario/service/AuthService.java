@@ -2,6 +2,7 @@ package com.controlefinaneiro.api.usuario.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,15 @@ public class AuthService {
 
         String token = tokenService.gerarToken(usuario);
         return token;
+    }
+
+    public Usuario getUsuarioAutenticado(){
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new RuntimeException("Usuário não autenticado");
+        }
+
+        return (Usuario) authentication.getPrincipal();
     }
 
 
