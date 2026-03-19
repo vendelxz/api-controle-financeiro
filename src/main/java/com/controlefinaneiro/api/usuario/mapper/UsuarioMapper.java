@@ -2,16 +2,16 @@ package com.controlefinaneiro.api.usuario.mapper;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
 
 import com.controlefinaneiro.api.usuario.dto.UsuarioDTO;
 import com.controlefinaneiro.api.usuario.dto.UsuarioResponseDTO;
 import com.controlefinaneiro.api.usuario.models.Usuario;
 
+@Component
 public class UsuarioMapper {
 
-    
-
-    public Usuario toModel(UsuarioDTO dto, String senhaHash){
+    public static Usuario toModel(UsuarioDTO dto, String senhaHash){
         Usuario usuario = new Usuario(
             dto.nome(),
             dto.email(),
@@ -20,7 +20,7 @@ public class UsuarioMapper {
         return usuario;
     }
 
-    public UsuarioResponseDTO toResponse(Usuario usuario){
+    public static UsuarioResponseDTO toResponse(Usuario usuario){
         UsuarioResponseDTO response = new UsuarioResponseDTO(
             usuario.getNome(),
             usuario.getEmail(),
@@ -29,7 +29,7 @@ public class UsuarioMapper {
         return response;
     }
 
-    public List<UsuarioResponseDTO> toResponseList(List<Usuario> usuarios){
+    public static List<UsuarioResponseDTO> toResponseList(List<Usuario> usuarios){
        return usuarios.stream()
         .map(u -> toResponse(u))
         .toList();
