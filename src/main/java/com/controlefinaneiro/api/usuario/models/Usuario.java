@@ -41,8 +41,8 @@ public class Usuario {
     private LocalDateTime dataCricao ;
 
     //Construtor padrão completo. (UsuarioMapper)
-    public Usuario( UUID id, @NotNull @NotBlank String nome, @Email @NotBlank @NotBlank String email,
-            @Size(min = 8) @NotBlank @NotNull String senha, LocalDateTime dataCricao) {
+    public Usuario( UUID id,@NotBlank String nome, @Email @NotBlank String email,
+            @Size(min = 8) @NotBlank String senha, LocalDateTime dataCricao) {
         this.id = id;
         this.nome = nome;
         this.email = email;
