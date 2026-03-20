@@ -16,7 +16,7 @@ import java.util.UUID;
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
 
-    List<Transacao> findByidUsuario(UUID idUsuario);
+    List<Transacao> findByIdUsuario(UUID idUsuario);
 
     List<Transacao> findByIdUsuarioAndDataTransacaoBetween (UUID idUsuario, LocalDate dataInicio, LocalDate dataFim);
 
