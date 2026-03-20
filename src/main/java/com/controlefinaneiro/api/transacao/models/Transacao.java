@@ -6,7 +6,6 @@ import com.controlefinaneiro.api.transacao.enums.TipoTransacao;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
