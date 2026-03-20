@@ -35,5 +35,16 @@ public class TratadorDeExceptions {
         
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> tratarRuntime(RuntimeException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("erro", ex.getMessage());
+
+        if(ex.getMessage().contains("Acesso negado")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors);
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
+}
 

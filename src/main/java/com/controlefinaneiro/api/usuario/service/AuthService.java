@@ -2,6 +2,7 @@ package com.controlefinaneiro.api.usuario.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class AuthService {
 
     public UsuarioResponseDTO registrar(UsuarioDTO dto){
         if(usuarioRepository.existsByEmail(dto.email())){
-            throw new RuntimeException("Email em uso, tente outro por favor.");
+            throw new IllegalArgumentException("Email em uso, tente outro por favor.");
         }
 
         String senhaHash = passwordEncoder.encode(dto.senha());
@@ -42,15 +43,24 @@ public class AuthService {
     public String autenticar(LoginDTO login){
         Usuario usuario = usuarioRepository.findByEmail(login.email());
         if(usuario == null){
-            throw new RuntimeException("Erro de autenticação.");
+            throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
         if(!passwordEncoder.matches(login.senha(), usuario.getSenha())){
-            throw new RuntimeException("E-mail ou senha incorretos.");
+            throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
         String token = tokenService.gerarToken(usuario);
         return token;
+    }
+
+    public Usuario getUsuarioAutenticado(){
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new RuntimeException("Usuário não autenticado");
+        }
+
+        return (Usuario) authentication.getPrincipal();
     }
 
 
