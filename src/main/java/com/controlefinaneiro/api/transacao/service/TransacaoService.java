@@ -6,6 +6,7 @@ import com.controlefinaneiro.api.transacao.enums.TipoTransacao;
 import com.controlefinaneiro.api.transacao.mapper.TransacaoMapper;
 import com.controlefinaneiro.api.transacao.models.Transacao;
 import com.controlefinaneiro.api.transacao.repository.TransacaoRepository;
+import com.controlefinaneiro.api.usuario.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,9 @@ public class TransacaoService {
 
     @Autowired
     private TransacaoRepository transacaoRepository;
+
+    @Autowired
+    private AuthService authService;
 
     @Autowired
     private TransacaoMapper transacaoMapper;

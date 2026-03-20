@@ -37,16 +37,16 @@ public class Usuario {
 
     @CreationTimestamp
     @Column(name = "data_criacao", updatable = false)
-    private LocalDateTime dataCricao ;
+    private LocalDateTime dataCriacao ;
 
     //Construtor padrão completo. (UsuarioMapper)
     public Usuario( UUID id,@NotBlank String nome, @Email @NotBlank String email,
-            @Size(min = 8) @NotBlank String senha, LocalDateTime dataCricao) {
+            @Size(min = 8) @NotBlank String senha, LocalDateTime dataCriacao) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.dataCricao = dataCricao;
+        this.dataCriacao = dataCriacao;
     }
 
     //Construtor vazio para o banco também
@@ -58,7 +58,7 @@ public class Usuario {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.dataCricao = LocalDateTime.now();
+        this.dataCriacao = LocalDateTime.now();
     }  
 
     public UUID getId() {
@@ -94,11 +94,11 @@ public class Usuario {
     }
 
     public LocalDateTime getDataCricao() {
-        return dataCricao;
+        return dataCriacao;
     }
 
     public void setDataCricao(LocalDateTime dataCricao) {
-        this.dataCricao = dataCricao;
+        this.dataCriacao = dataCricao;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class Usuario {
         result = prime * result + ((nome == null) ? 0 : nome.hashCode());
         result = prime * result + ((email == null) ? 0 : email.hashCode());
         result = prime * result + ((senha == null) ? 0 : senha.hashCode());
-        result = prime * result + ((dataCricao == null) ? 0 : dataCricao.hashCode());
+        result = prime * result + ((dataCriacao == null) ? 0 : dataCriacao.hashCode());
         return result;
     }
 
@@ -142,10 +142,10 @@ public class Usuario {
                 return false;
         } else if (!senha.equals(other.senha))
             return false;
-        if (dataCricao == null) {
-            if (other.dataCricao != null)
+        if (dataCriacao == null) {
+            if (other.dataCriacao != null)
                 return false;
-        } else if (!dataCricao.equals(other.dataCricao))
+        } else if (!dataCriacao.equals(other.dataCriacao))
             return false;
         return true;
     }
