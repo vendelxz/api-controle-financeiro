@@ -1,5 +1,6 @@
 package com.controlefinaneiro.api.usuario.mapper;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -30,6 +31,10 @@ public class UsuarioMapper {
     }
 
     public static List<UsuarioResponseDTO> toResponseList(List<Usuario> usuarios){
+        if(usuarios.isEmpty()){
+            return Collections.emptyList();
+        }
+        
        return usuarios.stream()
         .map(u -> toResponse(u))
         .toList();

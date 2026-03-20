@@ -2,39 +2,59 @@ package com.controlefinaneiro.api.transacao.mapper;
 
 
 import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.models.Transacao;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class TransacaoMapper {
 
-    public Transacao toEntity(TransacaoDTO dto) {
+    public static Transacao toEntity(TransacaoDTO dto, UUID idDoUsuario) {
         if(dto == null) return null;
 
-        Transacao transacaoEntity = new Transacao();
+        //Simplifiquei os mappers pra poder passar o ID sem ele transitar dentro do DTO.
+        Transacao transacao = new Transacao(
+            idDoUsuario,
+            dto.valor(),
+            dto.tipo(),
+            dto.categoria(),
+            dto.metodoPagamento(),
+            dto.descricao(),
+            dto.dataTransacao());
 
-        transacaoEntity.setIdUsuario(dto.idUsuario());
-        transacaoEntity.setValor(dto.valor());
-        transacaoEntity.setDataTransacao(dto.dataTransacao());
-        transacaoEntity.setTipo(dto.tipo());
-        transacaoEntity.setDescricao(dto.descricao());
-        transacaoEntity.setCategoria(dto.categoria());
-        transacaoEntity.setMetodoPagamento(dto.metodoPagamento());
-
-        return transacaoEntity;
+            return transacao;
     }
 
-    public TransacaoDTO toDTO(Transacao entity) {
-        if(entity == null) return null;
+    //Todas as transações sempre vão retornar essa mapeação aqui: limpa e segura, sem nenhum ID de usuário.
 
-        return new TransacaoDTO(
-                entity.getIdUsuario(),
-                entity.getValor(),
-                entity.getTipo(),
-                entity.getCategoria(),
-                entity.getMetodoPagamento(),
-                entity.getDescricao(),
-                entity.getDataTransacao()
+    public static TransacaoResponse toResponse(Transacao transacao) {
+        if(transacao == null) return null;
+
+        TransacaoResponse transacaoResponse = new TransacaoResponse(
+            transacao.getValor(),
+            transacao.getTipo(),
+            transacao.getCategoria(),
+            transacao.getMetodoPagamento(),
+            transacao.getDescricao(),
+            transacao.getDataTransacao()
         );
+        return transacaoResponse;
+    }
+
+    //Para métodos GET que for implementar, devolve a stream completa com uma pequena verificação antes
+    //Possui uma em Usuario também...
+    public static List<TransacaoResponse> listaDeTransacoes(List<Transacao> transacoes){
+        if(transacoes.isEmpty()){
+            return Collections.emptyList();
+        }
+
+        return transacoes.stream()
+        .map(u -> toResponse(u))
+        .toList();
     }
 }

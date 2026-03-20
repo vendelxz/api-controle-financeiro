@@ -2,6 +2,7 @@ package com.controlefinaneiro.api.transacao.service;
 
 
 import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.enums.TipoTransacao;
 import com.controlefinaneiro.api.transacao.mapper.TransacaoMapper;
 import com.controlefinaneiro.api.transacao.models.Transacao;
@@ -24,28 +25,28 @@ public class TransacaoService {
     @Autowired
     private TransacaoRepository transacaoRepository;
 
+
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    private TransacaoMapper transacaoMapper;
-
-
     @Transactional
-    public TransacaoDTO criar(TransacaoDTO transacaoDTO) {
-        Usuario usuarioLogado = authService.getUsuarioAutenticado();
+    public TransacaoResponse criar(TransacaoDTO transacaoDTO) {
         validarTransacaoCompleta(transacaoDTO);
 
-        Transacao transacao = transacaoMapper.toEntity(transacaoDTO);
-        transacao.setIdUsuario(usuarioLogado.getId());
-        Transacao salva = transacaoRepository.save(transacao);
+        UUID idDoUsuario = pegarIDUsuario();
 
-        return transacaoMapper.toDTO(salva);
+        Transacao transacaoASalvar = TransacaoMapper.toEntity(transacaoDTO, idDoUsuario);
+        Transacao salva = transacaoRepository.save(transacaoASalvar);
+
+        TransacaoResponse reposta = TransacaoMapper.toResponse(salva);
+
+        return reposta;
     }
 
     @Transactional
-    public TransacaoDTO atualizar(UUID id, TransacaoDTO transacaoDTO, UUID idUsuarioLogado) {
-        Transacao transacao = buscarEValidarDono(id, idUsuarioLogado);
+    public TransacaoResponse atualizar(UUID id, TransacaoDTO transacaoDTO) {
+        
+        Transacao transacao = buscarEValidarDono(id);
 
         validarTransacaoCompleta(transacaoDTO);
 
@@ -56,16 +57,18 @@ public class TransacaoService {
         transacao.setDescricao(transacaoDTO.descricao());
         transacao.setMetodoPagamento(transacaoDTO.metodoPagamento());
 
-        return transacaoMapper.toDTO(transacaoRepository.save(transacao));
+        return TransacaoMapper.toResponse(transacaoRepository.save(transacao));
     }
 
     @Transactional
-    public void deletar(UUID id, UUID idUsuarioLogado) {
-        buscarEValidarDono(id, idUsuarioLogado);
+    public void deletar(UUID id) {
+        buscarEValidarDono(id);
         transacaoRepository.deleteById(id);
     }
 
-    public List<TransacaoDTO> filtrarPorPeriodo(UUID idUsuario, int mes, int ano){
+    public List<TransacaoResponse> filtrarPorPeriodo( int mes, int ano){
+        UUID idUsuario = pegarIDUsuario();
+
         validarMesEAno(mes, ano);
         validarUsuario(idUsuario);
 
@@ -73,11 +76,15 @@ public class TransacaoService {
         LocalDate fim = inicio.withDayOfMonth(inicio.lengthOfMonth());
 
         return transacaoRepository.findByIdUsuarioAndDataTransacaoBetween(idUsuario,inicio,fim)
-                .stream().map(transacaoMapper::toDTO).collect(Collectors.toList());
+                .stream().map(TransacaoMapper::toResponse).collect(Collectors.toList());
     }
 
+    //Assim como nos outros métodos, todos são verificados internamente
+    //O token funciona como a autenticação usuário
+    //O sistema vai calcular o balanço de quem está logado de acordo com o token do login, logo não precisa passar ID para os métodos, beleza?
+    public BigDecimal calcularBalanco(){
+        UUID idUsuario = pegarIDUsuario();
 
-    public BigDecimal calcularBalanco(UUID idUsuario){
         validarUsuario(idUsuario);
 
         BigDecimal receitas = transacaoRepository.somarValorPorTipo(idUsuario, TipoTransacao.RECEITA);
@@ -92,7 +99,7 @@ public class TransacaoService {
     //validações
 
     private void validarTransacaoCompleta(TransacaoDTO dto) {
-        validarUsuario(dto.idUsuario());
+        pegarIDUsuario();
         validarValor(dto.valor());
         validarData(dto.dataTransacao());
 
@@ -134,13 +141,27 @@ public class TransacaoService {
             throw new IllegalArgumentException("Ano fora do intervalo permitido.");
         }
     }
-    private Transacao buscarEValidarDono(UUID idTransacao, UUID idUsuaioLogado){
+    private Transacao buscarEValidarDono(UUID idTransacao){
         Transacao transacao = transacaoRepository.findById(idTransacao).orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+        //Todos os métodos estou fazendo validação interna, isso é mais seguro
+        //Passar o id no body do controller é arriscado, o token já tem todas as informações do usuário ;)
+        UUID usuarioLogado = pegarIDUsuario();
 
-        if(!transacao.getIdUsuario().equals(idUsuaioLogado)){
+        if(!transacao.getIdUsuario().equals(usuarioLogado)){
             throw new RuntimeException("Acesso negado: Esta transação pertence a outro usuário.");
         }
 
         return transacao;
+    }
+
+    private UUID pegarIDUsuario(){
+        //Esse método que fiz é apenas auxiliar pra não ter que instanciar o AuthService toda hora
+        //Centraliza tudo aqui e só devolve o que me importa pra verificar todas as transações (O id)
+        Usuario usuario = authService.getUsuarioAutenticado();
+
+        if(usuario == null){
+            throw new IllegalArgumentException("Usuário não encontrado");
+        }
+        return usuario.getId();
     }
 }
