@@ -2,7 +2,11 @@ package com.controlefinaneiro.api.transacao.controller;
 
 
 import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.service.TransacaoService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +25,15 @@ public class TransacaoController {
     private TransacaoService transacaoService;
 
 
-    @PostMapping
-    public ResponseEntity<TransacaoDTO> criar(@RequestBody TransacaoDTO transacaoDTO) {
-        TransacaoDTO novaTransacao = transacaoService.criar(transacaoDTO);
+    @PostMapping("/criar")
+    public ResponseEntity<TransacaoResponse> criar(@Valid @RequestBody TransacaoDTO transacaoDTO) {
+        TransacaoResponse novaTransacao = transacaoService.criar(transacaoDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaTransacao);
     }
 
-    @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<List<TransacaoDTO>> listarPorUsuario(@PathVariable UUID idUsuario) {
-        List<TransacaoDTO> listaTransacoes = transacaoService.filtrarPorPeriodo(idUsuario,
+    @GetMapping("/usuario")
+    public ResponseEntity<List<TransacaoResponse>> listarPorUsuario() {
+        List<TransacaoResponse> listaTransacoes = transacaoService.filtrarPorPeriodo(
                 LocalDate.now().getMonthValue(),
                 LocalDate.now().getYear());
         return ResponseEntity.ok(listaTransacoes);
@@ -37,35 +41,35 @@ public class TransacaoController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable UUID id, UUID idUsuarioLogado) {
-        transacaoService.deletar(id, idUsuarioLogado);
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
+        transacaoService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<TransacaoDTO> atualizar(
+    @PutMapping("/{id}")
+    public ResponseEntity<TransacaoResponse> atualizar(
             @PathVariable UUID id,
-            @RequestBody TransacaoDTO transacaoDTO,
-             UUID idUsuarioLogado){
+            @RequestBody TransacaoDTO transacaoDTO
+             ){
 
-        TransacaoDTO atualizada = transacaoService.atualizar(id, transacaoDTO, idUsuarioLogado);
+        TransacaoResponse atualizada = transacaoService.atualizar(id, transacaoDTO);
         return ResponseEntity.ok(atualizada);
     }
 
-
-    @GetMapping("/balanco/{idUsuario}")
-    public ResponseEntity<BigDecimal> obterBalanco(@PathVariable UUID idUsuario) {
-        BigDecimal balanco = transacaoService.calcularBalanco(idUsuario);
+    //O token se encarrega de saber de quem vai ser o balanço, não há necessidade de passar ID
+    @GetMapping("/balanco")
+    public ResponseEntity<BigDecimal> obterBalanco() {
+        BigDecimal balanco = transacaoService.calcularBalanco();
         return ResponseEntity.ok(balanco);
     }
 
 
     @GetMapping("/filtro")
-    public ResponseEntity<List<TransacaoDTO>> filtrar(
-            @RequestParam UUID idUsuario,
+    public ResponseEntity<List<TransacaoResponse>> filtrar(
             @RequestParam int mes,
             @RequestParam int ano) {
 
-        List<TransacaoDTO> filtrados = transacaoService.filtrarPorPeriodo(idUsuario, mes, ano);
+        List<TransacaoResponse> filtrados = transacaoService.filtrarPorPeriodo( mes, ano);
         return ResponseEntity.ok(filtrados);
     }
 

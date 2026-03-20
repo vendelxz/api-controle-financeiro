@@ -8,8 +8,11 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "transacoes")
@@ -41,10 +44,12 @@ public class Transacao {
     @Column(length = 255)
     private String descricao;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDate dataTransacao;
 
 
+    //Um construtor já é suficiente, achei que precisaria de dois mas esse faz todo o serviço sem precisar de outro pra acumular lógica desnecessária.
     public Transacao(@Nullable UUID idUsuario, @Nullable BigDecimal valor, @Nullable TipoTransacao tipo, @Nullable Categoria categoria, @Nullable MetodoPagamento metodoPagamento, String descricao, @Nullable LocalDate dataTransacao) {
         this.categoria = categoria;
         this.dataTransacao = dataTransacao;
@@ -58,7 +63,7 @@ public class Transacao {
     public Transacao() {
     }
 
-
+   
     public Categoria getCategoria() {return categoria;}
     public void setCategoria(Categoria categoria) {this.categoria = categoria;}
 
