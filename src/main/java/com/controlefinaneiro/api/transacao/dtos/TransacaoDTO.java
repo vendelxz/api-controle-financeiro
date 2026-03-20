@@ -6,7 +6,6 @@ import com.controlefinaneiro.api.transacao.enums.TipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record TransacaoDTO(
