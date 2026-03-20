@@ -2,6 +2,7 @@ package com.controlefinaneiro.api.transacao.controller;
 
 
 import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.service.RelatorioService;
 import com.controlefinaneiro.api.transacao.service.TransacaoService;
 import com.controlefinaneiro.api.usuario.models.Usuario;
@@ -35,7 +36,7 @@ public class RelatorioController {
     @GetMapping("/pdf")
     public ResponseEntity<byte[]> downloadPdf(@RequestParam int mes, @RequestParam int ano) {
         Usuario usuario = authService.getUsuarioAutenticado();
-        List<TransacaoDTO> dados = transacaoService.filtrarPorPeriodo(usuario.getId(),mes,ano);
+        List<TransacaoResponse> dados = transacaoService.filtrarPorPeriodo(mes,ano);
 
         byte[] pdf = relatorioService.gerarRelatorioCompleto(dados,mes,ano);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=relatorioFinanceiro.pdf")

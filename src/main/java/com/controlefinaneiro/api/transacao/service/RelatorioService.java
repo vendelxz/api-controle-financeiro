@@ -2,6 +2,7 @@ package com.controlefinaneiro.api.transacao.service;
 
 
 import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import org.springframework.stereotype.Service;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
@@ -14,7 +15,7 @@ import java.util.List;
 @Service
 public class RelatorioService {
 
-    public byte[] gerarRelatorioCompleto(List<TransacaoDTO> transacao,int mes, int ano){
+    public byte[] gerarRelatorioCompleto(List<TransacaoResponse> transacao, int mes, int ano){
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document documento = new Document(PageSize.A4);
 
@@ -44,7 +45,7 @@ public class RelatorioService {
 
 
             //Listagem
-            for (TransacaoDTO transacaoDTO : transacao) {
+            for (TransacaoResponse transacaoDTO : transacao) {
                 tabela.addCell(transacaoDTO.dataTransacao().toString());
                 tabela.addCell(transacaoDTO.descricao());
                 tabela.addCell(transacaoDTO.categoria().toString());
