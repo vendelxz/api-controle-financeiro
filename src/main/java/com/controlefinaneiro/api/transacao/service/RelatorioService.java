@@ -1,7 +1,7 @@
 package com.controlefinaneiro.api.transacao.service;
 
 
-import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import org.springframework.stereotype.Service;
 import com.lowagie.text.*;
@@ -31,13 +31,15 @@ public class RelatorioService {
             documento.add(new Paragraph(" "));
 
             //Tabela de transações
-            PdfPTable tabela = new PdfPTable(4);
+            PdfPTable tabela = new PdfPTable(6);
             tabela.setWidthPercentage(100);
 
             //Cabeçalho da tabela
             tabela.addCell(new PdfPCell(new Phrase("Data")));
+            tabela.addCell(new PdfPCell(new Phrase("Tipo de transação")));
             tabela.addCell(new PdfPCell(new Phrase("Descrição")));
             tabela.addCell(new PdfPCell(new Phrase("Categoria")));
+            tabela.addCell(new PdfPCell(new Phrase("Método de Pagamento")));
             tabela.addCell(new PdfPCell(new Phrase("Valor")));
 
             BigDecimal totalReceitas = BigDecimal.ZERO;
@@ -47,8 +49,10 @@ public class RelatorioService {
             //Listagem
             for (TransacaoResponse transacaoDTO : transacao) {
                 tabela.addCell(transacaoDTO.dataTransacao().toString());
+                tabela.addCell(transacaoDTO.tipo().toString());
                 tabela.addCell(transacaoDTO.descricao());
                 tabela.addCell(transacaoDTO.categoria().toString());
+                tabela.addCell(transacaoDTO.metodoPagamento().toString());
 
                 String valorFormatado = "R$ " + transacaoDTO.valor();
                 tabela.addCell(valorFormatado);
