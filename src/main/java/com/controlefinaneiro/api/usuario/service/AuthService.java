@@ -2,10 +2,12 @@ package com.controlefinaneiro.api.usuario.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.controlefinaneiro.api.infra.notificacoes.eventos.UsuarioCadastradoEvent;
 import com.controlefinaneiro.api.infra.seguranca.TokenService;
 import com.controlefinaneiro.api.usuario.dto.LoginDTO;
 import com.controlefinaneiro.api.usuario.dto.UsuarioDTO;
@@ -26,6 +28,10 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    //Classe que cuida dos eventos
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     public UsuarioResponseDTO registrar(UsuarioDTO dto){
         if(usuarioRepository.existsByEmail(dto.email())){
             throw new IllegalArgumentException("Email em uso, tente outro por favor.");
@@ -35,6 +41,9 @@ public class AuthService {
 
         Usuario usuarioAsalvar = UsuarioMapper.toModel(dto, senhaHash);
         Usuario usuarioSalvo = usuarioRepository.save(usuarioAsalvar);
+
+        //Utilzação geral pra cadastrar um evento e disparar o e-mail
+        publisher.publishEvent(new UsuarioCadastradoEvent(usuarioSalvo));
 
         return UsuarioMapper.toResponse(usuarioSalvo);
 
