@@ -1,7 +1,7 @@
 package com.controlefinaneiro.api.transacao.controller;
 
 
-import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.service.RelatorioService;
 import com.controlefinaneiro.api.transacao.service.TransacaoService;
@@ -28,14 +28,10 @@ public class RelatorioController {
     @Autowired
     private TransacaoService transacaoService;
 
-    @Autowired
-    private AuthService authService;
-
 
     //Esse é pra download direto
     @GetMapping("/pdf")
     public ResponseEntity<byte[]> downloadPdf(@RequestParam int mes, @RequestParam int ano) {
-        Usuario usuario = authService.getUsuarioAutenticado();
         List<TransacaoResponse> dados = transacaoService.filtrarPorPeriodo(mes,ano);
 
         byte[] pdf = relatorioService.gerarRelatorioCompleto(dados,mes,ano);
