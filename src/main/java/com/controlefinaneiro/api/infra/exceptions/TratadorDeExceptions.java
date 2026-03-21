@@ -64,5 +64,10 @@ public class TratadorDeExceptions {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
       }
 
+      @ExceptionHandler(TokenInvalidoException.class)
+      public ResponseEntity<String> tratarTokenInvalido(TokenInvalidoException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+      }
+
 }
 
