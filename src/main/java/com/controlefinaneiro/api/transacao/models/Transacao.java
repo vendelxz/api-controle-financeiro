@@ -44,7 +44,6 @@ public class Transacao {
     @Column(length = 255)
     private String descricao;
 
-    @CreationTimestamp
     @Column(nullable = false)
     private LocalDate dataTransacao;
 

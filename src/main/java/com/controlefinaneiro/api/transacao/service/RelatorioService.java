@@ -1,7 +1,7 @@
 package com.controlefinaneiro.api.transacao.service;
 
 
-import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
+import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import org.springframework.stereotype.Service;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class RelatorioService {
 
-    public byte[] gerarRelatorioCompleto(List<TransacaoDTO> transacao,int mes, int ano){
+    public byte[] gerarRelatorioCompleto(List<TransacaoResponse> transacao, int mes, int ano){
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document documento = new Document(PageSize.A4);
 
@@ -30,11 +30,12 @@ public class RelatorioService {
             documento.add(new Paragraph(" "));
 
             //Tabela de transações
-            PdfPTable tabela = new PdfPTable(4);
+            PdfPTable tabela = new PdfPTable(5);
             tabela.setWidthPercentage(100);
 
             //Cabeçalho da tabela
             tabela.addCell(new PdfPCell(new Phrase("Data")));
+            tabela.addCell(new PdfPCell(new Phrase("Tipo de transação")));
             tabela.addCell(new PdfPCell(new Phrase("Descrição")));
             tabela.addCell(new PdfPCell(new Phrase("Categoria")));
             tabela.addCell(new PdfPCell(new Phrase("Valor")));
@@ -44,8 +45,9 @@ public class RelatorioService {
 
 
             //Listagem
-            for (TransacaoDTO transacaoDTO : transacao) {
+            for (TransacaoResponse transacaoDTO : transacao) {
                 tabela.addCell(transacaoDTO.dataTransacao().toString());
+                tabela.addCell(transacaoDTO.tipo().toString());
                 tabela.addCell(transacaoDTO.descricao());
                 tabela.addCell(transacaoDTO.categoria().toString());
 
