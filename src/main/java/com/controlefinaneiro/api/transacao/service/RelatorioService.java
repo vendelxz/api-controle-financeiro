@@ -1,18 +1,32 @@
 package com.controlefinaneiro.api.transacao.service;
 
 
+import com.controlefinaneiro.api.infra.notificacoes.eventos.RelatorioSolicitadoEvent;
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
+import com.controlefinaneiro.api.usuario.models.Usuario;
+import com.controlefinaneiro.api.usuario.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 public class RelatorioService {
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private AuthService authService;
 
     public byte[] gerarRelatorioCompleto(List<TransacaoResponse> transacao, int mes, int ano){
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -87,5 +101,12 @@ public class RelatorioService {
         }
 
         return out.toByteArray();
+    }
+
+    public void solicitarRelatorioEmail(int mes,int ano) {
+        Usuario usuario = authService.getUsuarioAutenticado();
+
+        // Apenas dispara o evento e responde ao usuário imediatamente
+        publisher.publishEvent(new RelatorioSolicitadoEvent(usuario, mes, ano));
     }
 }
