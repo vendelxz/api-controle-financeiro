@@ -1,5 +1,7 @@
 package com.controlefinaneiro.api.usuario.controller;
 
+import com.controlefinaneiro.api.infra.dto.EmailRequest;
+import com.controlefinaneiro.api.infra.dto.ResetSenhaRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +36,17 @@ public class AuthController {
     public ResponseEntity <String> login(@Valid @RequestBody LoginDTO dto){
         String token = authService.autenticar(dto);
         return ResponseEntity.status(HttpStatus.OK).body("token: "+ token);
+    }
+
+    @PostMapping("/esqueci-senha")
+    public ResponseEntity<Void> esqueciSenha(@Valid @RequestBody EmailRequest request){
+        authService.solicitarRecuperacao(request.email());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<Void> redefinirSenha(@RequestBody @Valid ResetSenhaRequest request){
+        authService.redefinirSenha(request.token(), request.novaSenha());
+        return ResponseEntity.ok().build();
     }
 }

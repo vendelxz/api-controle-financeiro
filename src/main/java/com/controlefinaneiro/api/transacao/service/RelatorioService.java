@@ -1,18 +1,32 @@
 package com.controlefinaneiro.api.transacao.service;
 
 
+import com.controlefinaneiro.api.infra.notificacoes.eventos.RelatorioSolicitadoEvent;
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
+import com.controlefinaneiro.api.usuario.models.Usuario;
+import com.controlefinaneiro.api.usuario.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 public class RelatorioService {
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private AuthService authService;
 
     public byte[] gerarRelatorioCompleto(List<TransacaoResponse> transacao, int mes, int ano){
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -30,7 +44,7 @@ public class RelatorioService {
             documento.add(new Paragraph(" "));
 
             //Tabela de transações
-            PdfPTable tabela = new PdfPTable(5);
+            PdfPTable tabela = new PdfPTable(6);
             tabela.setWidthPercentage(100);
 
             //Cabeçalho da tabela
@@ -38,6 +52,7 @@ public class RelatorioService {
             tabela.addCell(new PdfPCell(new Phrase("Tipo de transação")));
             tabela.addCell(new PdfPCell(new Phrase("Descrição")));
             tabela.addCell(new PdfPCell(new Phrase("Categoria")));
+            tabela.addCell(new PdfPCell(new Phrase("Método de Pagamento")));
             tabela.addCell(new PdfPCell(new Phrase("Valor")));
 
             BigDecimal totalReceitas = BigDecimal.ZERO;
@@ -50,6 +65,7 @@ public class RelatorioService {
                 tabela.addCell(transacaoDTO.tipo().toString());
                 tabela.addCell(transacaoDTO.descricao());
                 tabela.addCell(transacaoDTO.categoria().toString());
+                tabela.addCell(transacaoDTO.metodoPagamento().toString());
 
                 String valorFormatado = "R$ " + transacaoDTO.valor();
                 tabela.addCell(valorFormatado);
@@ -85,5 +101,12 @@ public class RelatorioService {
         }
 
         return out.toByteArray();
+    }
+
+    public void solicitarRelatorioEmail(int mes,int ano) {
+        Usuario usuario = authService.getUsuarioAutenticado();
+
+        // Apenas dispara o evento e responde ao usuário imediatamente
+        publisher.publishEvent(new RelatorioSolicitadoEvent(usuario, mes, ano));
     }
 }
