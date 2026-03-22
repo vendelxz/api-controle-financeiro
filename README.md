@@ -2,7 +2,7 @@
 
 # API Sistema Financeiro - Backend
 
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-red?style=for-the-badge)
 
 Uma API RESTful robusta para controle e gestão financeira, projetada com foco em segurança, autenticação e boas práticas de arquitetura.
 

@@ -1,7 +1,5 @@
 package com.controlefinaneiro.api.usuario.controller;
 
-import com.controlefinaneiro.api.infra.dto.EmailRequest;
-import com.controlefinaneiro.api.infra.dto.ResetSenhaRequest;
 import com.controlefinaneiro.api.infra.seguranca.jwt.TokenResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.controlefinaneiro.api.usuario.dto.EmailRequest;
 import com.controlefinaneiro.api.usuario.dto.LoginDTO;
+import com.controlefinaneiro.api.usuario.dto.ResetSenhaRequest;
 import com.controlefinaneiro.api.usuario.dto.UsuarioDTO;
 import com.controlefinaneiro.api.usuario.dto.UsuarioResponseDTO;
 import com.controlefinaneiro.api.usuario.service.AuthService;
