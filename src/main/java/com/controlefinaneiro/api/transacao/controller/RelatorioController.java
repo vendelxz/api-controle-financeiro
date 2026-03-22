@@ -5,8 +5,6 @@ package com.controlefinaneiro.api.transacao.controller;
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.service.RelatorioService;
 import com.controlefinaneiro.api.transacao.service.TransacaoService;
-import com.controlefinaneiro.api.usuario.models.Usuario;
-import com.controlefinaneiro.api.usuario.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

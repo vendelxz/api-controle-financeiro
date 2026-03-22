@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.controlefinaneiro.api.infra.seguranca.jwt.TokenService;
 import com.controlefinaneiro.api.usuario.models.Usuario;
 import com.controlefinaneiro.api.usuario.repository.UsuarioRepository;
 

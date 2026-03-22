@@ -1,4 +1,4 @@
-package com.controlefinaneiro.api.infra.seguranca;
+package com.controlefinaneiro.api.infra.seguranca.jwt;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.controlefinaneiro.api.infra.notificacoes.eventos.UsuarioCadastradoEvent;
-import com.controlefinaneiro.api.infra.seguranca.TokenService;
+import com.controlefinaneiro.api.infra.seguranca.jwt.TokenService;
 import com.controlefinaneiro.api.usuario.dto.LoginDTO;
 import com.controlefinaneiro.api.usuario.dto.UsuarioDTO;
 import com.controlefinaneiro.api.usuario.dto.UsuarioResponseDTO;
@@ -92,8 +92,10 @@ public class AuthService {
         }
 
         //Invalia qualquer token que nao foi usado antes
-        tokenRepository.invalidarTokensAntigos(usuario.getId());
+        tokenRepository.deletarPorUsuarioId(usuario.getId());
 
+        //Vou dar um flush pra obrigar ele a rodar e conseguir apagar o token
+        tokenRepository.flush();
         //Gera token aleatorio
         String valorToken = UUID.randomUUID().toString();
 
