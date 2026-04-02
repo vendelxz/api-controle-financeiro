@@ -49,6 +49,10 @@ public class AuthService {
             throw new IllegalArgumentException("Email em uso, tente outro por favor.");
         }
 
+        if(!dto.senha().equals(dto.confirmarSenha())){
+            throw new IllegalArgumentException("As senhas digitadas são diferentes.");
+        }
+
         String senhaHash = passwordEncoder.encode(dto.senha());
 
         Usuario usuarioAsalvar = UsuarioMapper.toModel(dto, senhaHash);

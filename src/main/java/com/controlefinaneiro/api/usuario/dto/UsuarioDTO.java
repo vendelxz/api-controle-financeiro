@@ -17,7 +17,11 @@ public record UsuarioDTO(
 
     @Size(min = 8)
     @NotBlank(message = "Senha é obrigatória.")
-    String senha
+    String senha,
+
+    @Size(min = 8)
+    @NotBlank(message = "Campo de confirmação obrigatório.")
+    String confirmarSenha
 
 ) {
 
