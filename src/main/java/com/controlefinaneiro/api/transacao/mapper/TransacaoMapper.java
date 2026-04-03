@@ -36,6 +36,7 @@ public class TransacaoMapper {
         if(transacao == null) return null;
 
         TransacaoResponse transacaoResponse = new TransacaoResponse(
+            transacao.getId(), //Precisei adicionar para poder deletar no front, mas os dados não passam em tabelas. É apenas para exclusão...
             transacao.getValor(),
             transacao.getTipo(),
             transacao.getCategoria(),
