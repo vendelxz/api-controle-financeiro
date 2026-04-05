@@ -24,7 +24,7 @@ public class RelatorioEventListener {
     private EmailService emailService;
 
 
-    @Async
+    @Async("taskExecutor")
     @EventListener
     public void processarRelatorioSolicitado(RelatorioSolicitadoEvent evento){
         try {
