@@ -31,8 +31,8 @@ public class Usuario {
     @Column(nullable = false, unique =  true)
     private String email;
 
-    @Size(min = 8)
     @NotBlank(message = "Senha é obrigatória.")
+    @Column(nullable = false)
     private String senha;
 
     @CreationTimestamp
