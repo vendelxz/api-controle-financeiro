@@ -22,7 +22,7 @@ public class RecuperaSenhaListener {
     @EventListener
     public void processarRecuperaSenhaEvent(RecuperarSenhaEvent evento) {
         //Link que aponta para o front
-        String urlReset = urlFrontend + "/redefinir-senha?token=" + evento.token();
+        String urlReset = urlFrontend + "auth/redefinir-senha.html?token=" + evento.token();
 
         String assunto = "Recuperação de Senha - Controle Financeiro";
         String corpo = String.format(
