@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,6 +25,7 @@ public interface TokenRecuperacaoRepository extends JpaRepository<TokenRecuperac
     //Vou testar usar essa de deletar o token pra garantir no teste por agora
     @Modifying
     @Query("DELETE FROM TokenRecuperacao t WHERE t.usuario.id = :usuarioId")
+    @Transactional
     void deletarPorUsuarioId(@Param("usuarioId") UUID usuarioId);
 
     void deleteByDataExpiracaoBefore(LocalDateTime now);
