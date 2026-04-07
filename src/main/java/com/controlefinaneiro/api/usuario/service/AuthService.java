@@ -91,9 +91,7 @@ public class AuthService {
     @Transactional
     public void solicitarRecuperacao(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email);
-        if(usuario == null){
-            throw new RuntimeException("Usuário não encontrado");
-        }
+         if(usuario == null){ return ;} //Para garantir o 200 no build();
 
         //Invalia qualquer token que nao foi usado antes
         tokenRepository.deletarPorUsuarioId(usuario.getId());
