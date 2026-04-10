@@ -2,7 +2,7 @@
 
 # API Sistema Financeiro - Backend
 
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-red?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-%20Online-darkgreen?style=for-the-badge)
 
 Uma API RESTful robusta para controle e gestão financeira, projetada com foco em segurança, autenticação e boas práticas de arquitetura.
 
@@ -14,6 +14,8 @@ Uma API RESTful robusta para controle e gestão financeira, projetada com foco e
 ![SQLite](https://img.shields.io/badge/SQLite%20(Testes)-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL%20(Produ%C3%A7%C3%A3o)-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS%20(Deploy)-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker%20(Containers)-2496ED?style=for-the-badge&logo=Docker&logoColor=blue)
+
 ---
 
 ### 🛠️ Frameworks e Ferramentas
