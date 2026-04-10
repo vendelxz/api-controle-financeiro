@@ -3,6 +3,8 @@ package com.controlefinaneiro.api.transacao.models;
 import com.controlefinaneiro.api.transacao.enums.Categoria;
 import com.controlefinaneiro.api.transacao.enums.MetodoPagamento;
 import com.controlefinaneiro.api.transacao.enums.TipoTransacao;
+import com.controlefinaneiro.api.usuario.models.Usuario;
+
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
@@ -23,8 +25,9 @@ public class Transacao {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "usuario_id", nullable = false)
-    private UUID idUsuario;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @Column(nullable = false)
     private BigDecimal valor;
@@ -49,11 +52,11 @@ public class Transacao {
 
 
     //Um construtor já é suficiente, achei que precisaria de dois mas esse faz todo o serviço sem precisar de outro pra acumular lógica desnecessária.
-    public Transacao(@Nullable UUID idUsuario, @Nullable BigDecimal valor, @Nullable TipoTransacao tipo, @Nullable Categoria categoria, @Nullable MetodoPagamento metodoPagamento, String descricao, @Nullable LocalDate dataTransacao) {
+    public Transacao(@Nullable Usuario usuario, @Nullable BigDecimal valor, @Nullable TipoTransacao tipo, @Nullable Categoria categoria, @Nullable MetodoPagamento metodoPagamento, String descricao, @Nullable LocalDate dataTransacao) {
         this.categoria = categoria;
         this.dataTransacao = dataTransacao;
         this.descricao = descricao;
-        this.idUsuario = idUsuario;
+        this.usuario = usuario;
         this.metodoPagamento = metodoPagamento;
         this.tipo = tipo;
         this.valor = valor;
@@ -75,8 +78,8 @@ public class Transacao {
     public UUID getId() {return id;}
     public void setId(UUID id) {this.id = id;}
 
-    public UUID getIdUsuario() {return idUsuario;}
-    public void setIdUsuario(UUID idUsuario) {this.idUsuario = idUsuario;}
+    public Usuario getUsuario() {return usuario;}
+    public void setUsuario(Usuario usuario) {this.usuario = usuario;}
 
     public MetodoPagamento getMetodoPagamento() {return metodoPagamento;}
     public void setMetodoPagamento(MetodoPagamento metodoPagamento) {this.metodoPagamento = metodoPagamento;}

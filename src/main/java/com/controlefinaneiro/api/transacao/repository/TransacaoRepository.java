@@ -16,15 +16,15 @@ import java.util.UUID;
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
 
-    List<Transacao> findByIdUsuario(UUID idUsuario);
+    List<Transacao> findByUsuarioId(UUID usuarioId);
 
-    List<Transacao> findByIdUsuarioAndDataTransacaoBetween (UUID idUsuario, LocalDate dataInicio, LocalDate dataFim);
+List<Transacao> findByUsuarioIdAndDataTransacaoBetween(UUID usuarioId, LocalDate dataInicio, LocalDate dataFim);
 
-    List<Transacao> findByIdUsuarioAndTipo(UUID idUsuario, TipoTransacao tipo);
+List<Transacao> findByUsuarioIdAndTipo(UUID usuarioId, TipoTransacao tipo);
 
-    @Query("SELECT SUM(t.valor) FROM Transacao t WHERE t.idUsuario = :idUsuario AND t.tipo = :tipo")
-    BigDecimal somarValorPorTipo(@Param("idUsuario") UUID idUsuario, @Param("tipo") TipoTransacao tipo);
+@Query("SELECT SUM(t.valor) FROM Transacao t WHERE t.usuario.id = :usuarioId AND t.tipo = :tipo")
+BigDecimal somarValorPorTipo(@Param("usuarioId") UUID usuarioId, @Param("tipo") TipoTransacao tipo);
 
-    @Query("SELECT t FROM Transacao t WHERE t.idUsuario = :idUsuario AND t.categoria = :categoria")
-    List<Transacao> buscarPorCategoria(@Param("idUsuario") UUID idUsuario, @Param("categoria")Categoria categoria);
+@Query("SELECT t FROM Transacao t WHERE t.usuario.id = :usuarioId AND t.categoria = :categoria")
+List<Transacao> buscarPorCategoria(@Param("usuarioId") UUID usuarioId, @Param("categoria") Categoria categoria);
 }

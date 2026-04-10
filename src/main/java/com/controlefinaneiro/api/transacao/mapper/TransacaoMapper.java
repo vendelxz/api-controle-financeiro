@@ -4,6 +4,7 @@ package com.controlefinaneiro.api.transacao.mapper;
 import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.models.Transacao;
+import com.controlefinaneiro.api.usuario.models.Usuario;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,12 +15,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransacaoMapper {
 
-    public static Transacao toEntity(TransacaoDTO dto, UUID idDoUsuario) {
+    public static Transacao toEntity(TransacaoDTO dto, Usuario usuario) {
         if(dto == null) return null;
 
         //Simplifiquei os mappers pra poder passar o ID sem ele transitar dentro do DTO.
         Transacao transacao = new Transacao(
-            idDoUsuario,
+            usuario,
             dto.valor(),
             dto.tipo(),
             dto.categoria(),
