@@ -14,15 +14,14 @@ public class RecuperaSenhaListener {
     @Autowired
     private EmailService emailService;
 
-    @Value("${app.frontend.url}")
-    private String urlFrontend;
-
 
     @Async
     @EventListener
     public void processarRecuperaSenhaEvent(RecuperarSenhaEvent evento) {
         //Link que aponta para o front
-        String urlReset = urlFrontend + "auth/redefinir-senha.html?token=" + evento.token();
+
+        String urlBase = evento.origem();
+        String urlReset = urlBase + "auth/redefinir-senha.html?token=" + evento.token();
 
         String assunto = "Recuperação de Senha - Controle Financeiro";
         String corpo = String.format(

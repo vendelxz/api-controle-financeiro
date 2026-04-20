@@ -2,6 +2,7 @@ package com.controlefinaneiro.api.infra.seguranca;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,6 +26,9 @@ import jakarta.servlet.Filter;
 public class SecurityConfigurations {
 
     private final SecurityFilter securityFilter;
+
+    @Value("${cors.allowed-origins}")
+    private String[] allowedOrigins;
 
     public SecurityConfigurations(SecurityFilter securityFilter){   
         this.securityFilter = securityFilter;
@@ -66,7 +70,7 @@ public class SecurityConfigurations {
         CorsConfiguration configuration = new CorsConfiguration();
         
         //Porta que vai rodar o front da API
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5500", "http://127.0.0.1:5500", "https://vendelxz.github.io", "https://vendelxz.github.io/"));
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

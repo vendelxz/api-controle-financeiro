@@ -43,7 +43,7 @@ public class AuthController {
 
     @PostMapping("/esqueci-senha")
     public ResponseEntity<Void> esqueciSenha(@Valid @RequestBody EmailRequest request){
-        authService.solicitarRecuperacao(request.email());
+        authService.solicitarRecuperacao(request.email(), request.origem());
         return ResponseEntity.ok().build();
     }
 
