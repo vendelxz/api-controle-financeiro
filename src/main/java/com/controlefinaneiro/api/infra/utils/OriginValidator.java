@@ -15,6 +15,11 @@ public class OriginValidator {
             return urlReset;
          }
 
+         if(origem.contains("localhost")){ //Qualquer ambiente de desenvolvimento local...
+            urlReset = "/auth/redefinir-senha.html?token=";
+            return urlReset;
+         }
+
          //Se não for nenhum retornar nulo para tratar como exception...
          return null;
 
