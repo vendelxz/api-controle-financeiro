@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "cors.allowed-origins",
+    "type": "java.lang.String",
+    "description": "List of allowed origins for CORS configuration."
+  },
+  {
+    "name": "token.secret",
+    "type": "java.lang.String",
+    "description": "Secret key used for API token generation and validation."
+  }
+]}

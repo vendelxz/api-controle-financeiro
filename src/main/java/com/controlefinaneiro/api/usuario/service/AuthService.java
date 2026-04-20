@@ -89,7 +89,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void solicitarRecuperacao(String email) {
+    public void solicitarRecuperacao(String email, String origem){ 
         Usuario usuario = usuarioRepository.findByEmail(email);
          if(usuario == null){ return ;} //Para garantir o 200 no build();
 
@@ -101,6 +101,8 @@ public class AuthService {
         //Gera token aleatorio
         String valorToken = UUID.randomUUID().toString();
 
+        //Capturar a origem...
+
         TokenRecuperacao novoToken = new TokenRecuperacao();
         novoToken.setToken(valorToken);
         novoToken.setUsuario(usuario);
@@ -108,7 +110,8 @@ public class AuthService {
 
         tokenRepository.save(novoToken);
 
-        publisher.publishEvent(new RecuperarSenhaEvent(usuario,valorToken));
+        publisher.publishEvent(new RecuperarSenhaEvent(usuario,valorToken, origem));
+
     }
 
     @Transactional
