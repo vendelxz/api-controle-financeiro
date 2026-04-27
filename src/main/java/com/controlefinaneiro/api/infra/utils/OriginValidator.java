@@ -7,7 +7,7 @@ public class OriginValidator {
         String urlReset;
 
         if(origem.contains("vercel.app")){
-            urlReset = "/auth/redefinir-senha.html?token=";
+            urlReset = "/auth/redefinir-senha?token=";//React não response a .html no link
             return urlReset;
         }
         if(origem.contains("github.io")){
@@ -15,7 +15,12 @@ public class OriginValidator {
             return urlReset;
          }
 
-         if(origem.contains("localhost")){ //Qualquer ambiente de desenvolvimento local...
+         if(origem.contains("localhost:5173")){ //Ambiente do React...
+            urlReset = "/auth/redefinir-senha?token=";//React não response a .html no link
+            return urlReset;
+         }
+
+         if(origem.contains("localhost:5500")){ //Ambiente padrão do Github Pages para desenvolvimento.
             urlReset = "/auth/redefinir-senha.html?token=";
             return urlReset;
          }
