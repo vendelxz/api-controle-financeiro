@@ -1,7 +1,10 @@
 package com.controlefinaneiro.api.infra.notificacoes.listeners;
 
 import com.controlefinaneiro.api.infra.email.EmailService;
+import com.controlefinaneiro.api.infra.exceptions.OrigemInvalidaException;
 import com.controlefinaneiro.api.infra.notificacoes.eventos.RecuperarSenhaEvent;
+import com.controlefinaneiro.api.infra.utils.OriginValidator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -21,7 +24,15 @@ public class RecuperaSenhaListener {
         //Link que aponta para o front
 
         String urlBase = evento.origem();
-        String urlReset = urlBase + "auth/redefinir-senha.html?token=" + evento.token();
+        //Pega a URL de acordo com o que vem...
+        String urlReset = OriginValidator.validadorDeOrigem(urlBase);
+
+        if(urlReset == null){
+            //Se for nulo trata para não estourar NullPointerException...
+            throw new OrigemInvalidaException("Origem não identificada para montar o link.");
+        }
+
+        String urlCompleta = urlBase + urlReset + evento.token();
 
         String assunto = "Recuperação de Senha - Controle Financeiro";
         String corpo = String.format(
@@ -30,7 +41,7 @@ public class RecuperaSenhaListener {
                         "Para prosseguir, clique no link abaixo:\n\n%s\n\n" +
                         "Este link é válido por 10 minutos. Se você não solicitou isso, ignore este e-mail.",
                 evento.usuario().getNome(),
-                urlReset
+                urlCompleta
         );
 
 
