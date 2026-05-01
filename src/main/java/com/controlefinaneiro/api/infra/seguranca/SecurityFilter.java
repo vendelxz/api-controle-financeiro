@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.controlefinaneiro.api.infra.seguranca.jwt.TokenService;
 import com.controlefinaneiro.api.usuario.models.Usuario;
 import com.controlefinaneiro.api.usuario.repository.UsuarioRepository;
@@ -30,28 +31,42 @@ public class SecurityFilter extends OncePerRequestFilter {
         this.repository = repository;
     }
 
+    //Em alguns cenários tenta captura o token mesmo em endpoints públicos...
+    //Refatorar para pegar apenas se o Bearer estiver presente no cabeçalho...
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = this.recuperarToken(request);
+        //String token = this.recuperarToken(request);
+        //TokenHeader para ver o Authorization correto
+        var tokenHeader = request.getHeader("Authorization");
 
-        if (token != null) {
-            String email = tokenService.validarToken(token); 
-            
-            if (!email.isEmpty()) {
+        if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try{
+            var token = tokenHeader.replace("Bearer ", "");
+            var email = tokenService.validarToken(token);//O subject que retorna é o email do usuário...
+
+            if(email != null){
                 Usuario usuario = repository.findByEmail(email);
-                if(usuario.getEmail().isBlank()){
-                    throw new IllegalArgumentException();
-                } 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null, Collections.emptyList());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+
+            filterChain.doFilter(request, response);
+
+        }catch(TokenExpiredException e){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);// 401 para dizer que é proibido;
+            return;
+
         }
 
-        filterChain.doFilter(request, response);
     }
 
+    //Apenas de uso em casos necessários..
     private String recuperarToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null) return null;
@@ -59,3 +74,6 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
 }
+
+ 
+                
