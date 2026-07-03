@@ -69,5 +69,13 @@ public class TratadorDeExceptions {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
       }
 
+      @ExceptionHandler(OrigemInvalidaException.class)
+      public ResponseEntity<Map<String, String>> tratarOrigemInvalida(OrigemInvalidaException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+      }
+
 }
+
 

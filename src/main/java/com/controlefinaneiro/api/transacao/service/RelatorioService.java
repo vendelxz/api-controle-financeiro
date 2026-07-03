@@ -7,13 +7,11 @@ import com.controlefinaneiro.api.usuario.models.Usuario;
 import com.controlefinaneiro.api.usuario.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;

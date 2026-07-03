@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.controlefinaneiro.api.infra.notificacoes.eventos.UsuarioCadastradoEvent;
-import com.controlefinaneiro.api.infra.seguranca.TokenService;
+import com.controlefinaneiro.api.infra.seguranca.jwt.TokenService;
 import com.controlefinaneiro.api.usuario.dto.LoginDTO;
 import com.controlefinaneiro.api.usuario.dto.UsuarioDTO;
 import com.controlefinaneiro.api.usuario.dto.UsuarioResponseDTO;
@@ -47,6 +47,10 @@ public class AuthService {
     public UsuarioResponseDTO registrar(UsuarioDTO dto){
         if(usuarioRepository.existsByEmail(dto.email())){
             throw new IllegalArgumentException("Email em uso, tente outro por favor.");
+        }
+
+        if(!dto.senha().equals(dto.confirmarSenha())){
+            throw new IllegalArgumentException("As senhas digitadas são diferentes.");
         }
 
         String senhaHash = passwordEncoder.encode(dto.senha());
@@ -85,17 +89,19 @@ public class AuthService {
     }
 
     @Transactional
-    public void solicitarRecuperacao(String email) {
+    public void solicitarRecuperacao(String email, String origem){ 
         Usuario usuario = usuarioRepository.findByEmail(email);
-        if(usuario == null){
-            throw new RuntimeException("Usuário não encontrado");
-        }
+         if(usuario == null){ return ;} //Para garantir o 200 no build();
 
         //Invalia qualquer token que nao foi usado antes
-        tokenRepository.invalidarTokensAntigos(usuario.getId());
+        tokenRepository.deletarPorUsuarioId(usuario.getId());
 
+        //Vou dar um flush pra obrigar ele a rodar e conseguir apagar o token
+        tokenRepository.flush();
         //Gera token aleatorio
         String valorToken = UUID.randomUUID().toString();
+
+        //Capturar a origem...
 
         TokenRecuperacao novoToken = new TokenRecuperacao();
         novoToken.setToken(valorToken);
@@ -104,7 +110,8 @@ public class AuthService {
 
         tokenRepository.save(novoToken);
 
-        publisher.publishEvent(new RecuperarSenhaEvent(usuario,valorToken));
+        publisher.publishEvent(new RecuperarSenhaEvent(usuario,valorToken, origem));
+
     }
 
     @Transactional

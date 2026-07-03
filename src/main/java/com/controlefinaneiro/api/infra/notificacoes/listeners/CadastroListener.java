@@ -23,7 +23,7 @@ public class CadastroListener {
         try {
             String destinatario = evento.usuario().getEmail();
             String assunto = "Bem vindo ao Controle Financeiro";
-            String mensagem = "Olá! Seu cadastro foi realizado com sucesso. Comece a gerenciar suas finanças agora mesmo! \n\n" +
+            String mensagem = "Olá!: "+evento.usuario().getNome()+" Seu cadastro foi realizado com sucesso. Comece a gerenciar suas finanças agora mesmo! \n\n" +
                                 "Atenciosamente, Equipe de desenvolvimento";
 
             emailService.enviarEmail(destinatario, assunto, mensagem);

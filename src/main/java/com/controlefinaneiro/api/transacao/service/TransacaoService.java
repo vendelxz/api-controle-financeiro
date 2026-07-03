@@ -33,9 +33,9 @@ public class TransacaoService {
     public TransacaoResponse criar(TransacaoDTO transacaoDTO) {
         validarTransacaoCompleta(transacaoDTO);
 
-        UUID idDoUsuario = pegarIDUsuario();
+        Usuario usuario = pegarUsuario();
 
-        Transacao transacaoASalvar = TransacaoMapper.toEntity(transacaoDTO, idDoUsuario);
+        Transacao transacaoASalvar = TransacaoMapper.toEntity(transacaoDTO, usuario);
         Transacao salva = transacaoRepository.save(transacaoASalvar);
 
         TransacaoResponse reposta = TransacaoMapper.toResponse(salva);
@@ -67,15 +67,15 @@ public class TransacaoService {
     }
 
     public List<TransacaoResponse> filtrarPorPeriodo( int mes, int ano){
-        UUID idUsuario = pegarIDUsuario();
+        Usuario usuario = pegarUsuario();
 
         validarMesEAno(mes, ano);
-        validarUsuario(idUsuario);
+        validarUsuario(usuario.getId());
 
         LocalDate inicio = LocalDate.of(ano,mes,1);
         LocalDate fim = inicio.withDayOfMonth(inicio.lengthOfMonth());
 
-        return transacaoRepository.findByIdUsuarioAndDataTransacaoBetween(idUsuario,inicio,fim)
+        return transacaoRepository.findByUsuarioIdAndDataTransacaoBetween(usuario.getId(), inicio,fim)
                 .stream().map(TransacaoMapper::toResponse).collect(Collectors.toList());
     }
 
@@ -83,12 +83,12 @@ public class TransacaoService {
     //O token funciona como a autenticação usuário
     //O sistema vai calcular o balanço de quem está logado de acordo com o token do login, logo não precisa passar ID para os métodos, beleza?
     public BigDecimal calcularBalanco(){
-        UUID idUsuario = pegarIDUsuario();
+      Usuario usuario = pegarUsuario();
 
-        validarUsuario(idUsuario);
+        validarUsuario(usuario.getId());
 
-        BigDecimal receitas = transacaoRepository.somarValorPorTipo(idUsuario, TipoTransacao.RECEITA);
-        BigDecimal despesas = transacaoRepository.somarValorPorTipo(idUsuario, TipoTransacao.DESPESA);
+        BigDecimal receitas = transacaoRepository.somarValorPorTipo(usuario.getId(), TipoTransacao.RECEITA);
+        BigDecimal despesas = transacaoRepository.somarValorPorTipo(usuario.getId(), TipoTransacao.DESPESA);
 
         receitas = (receitas != null ? receitas : BigDecimal.ZERO);
         despesas = (despesas != null ? despesas : BigDecimal.ZERO);
@@ -99,7 +99,7 @@ public class TransacaoService {
     //validações
 
     private void validarTransacaoCompleta(TransacaoDTO dto) {
-        pegarIDUsuario();
+        pegarUsuario();
         validarValor(dto.valor());
         validarData(dto.dataTransacao());
 
@@ -145,16 +145,16 @@ public class TransacaoService {
         Transacao transacao = transacaoRepository.findById(idTransacao).orElseThrow(() -> new RuntimeException("Transação não encontrada"));
         //Todos os métodos estou fazendo validação interna, isso é mais seguro
         //Passar o id no body do controller é arriscado, o token já tem todas as informações do usuário ;)
-        UUID usuarioLogado = pegarIDUsuario();
+        Usuario usuarioLogado = pegarUsuario();
 
-        if(!transacao.getIdUsuario().equals(usuarioLogado)){
+        if(!transacao.getUsuario().equals(usuarioLogado)){
             throw new RuntimeException("Acesso negado: Esta transação pertence a outro usuário.");
         }
 
         return transacao;
     }
 
-    private UUID pegarIDUsuario(){
+    private Usuario pegarUsuario(){
         //Esse método que fiz é apenas auxiliar pra não ter que instanciar o AuthService toda hora
         //Centraliza tudo aqui e só devolve o que me importa pra verificar todas as transações (O id)
         Usuario usuario = authService.getUsuarioAutenticado();
@@ -162,6 +162,6 @@ public class TransacaoService {
         if(usuario == null){
             throw new IllegalArgumentException("Usuário não encontrado");
         }
-        return usuario.getId();
+       return usuario;
     }
 }
