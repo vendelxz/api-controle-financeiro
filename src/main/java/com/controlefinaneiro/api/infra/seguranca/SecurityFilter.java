@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.controlefinaneiro.api.infra.seguranca.jwt.TokenService;
 import com.controlefinaneiro.api.usuario.models.Usuario;
 import com.controlefinaneiro.api.usuario.repository.UsuarioRepository;
@@ -50,7 +50,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             var token = tokenHeader.replace("Bearer ", "");
             var email = tokenService.validarToken(token);//O subject que retorna é o email do usuário...
 
-            if(email != null){
+            if(email != null && !email.isBlank()){
                 Usuario usuario = repository.findByEmail(email);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null, Collections.emptyList());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -58,7 +58,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
-        }catch(TokenExpiredException e){
+        }catch(JWTVerificationException e){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);// 401 para dizer que é proibido;
             return;
 
