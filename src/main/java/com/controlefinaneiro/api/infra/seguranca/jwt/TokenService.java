@@ -39,18 +39,13 @@ public class TokenService {
     }
 
     public String validarToken(String token){
-        try{
-            Algorithm algoritmo = Algorithm.HMAC256(secret);
+        Algorithm algoritmo = Algorithm.HMAC256(secret);
 
-            return JWT.require(algoritmo)
-                    .withIssuer("API Controle Financeiro") // Verifica se fomos nós que emitimos
-                    .build()
-                    .verify(token) // Valida a assinatura e a expiração
-                    .getSubject(); // Retorna o e-mail do usuário (o Subject)
-
-        }catch(JWTCreationException e){
-            return "";
-        }
+        return JWT.require(algoritmo)
+                .withIssuer("API Controle Financeiro") // Verifica se fomos nós que emitimos
+                .build()
+                .verify(token) // Valida a assinatura e a expiração
+                .getSubject(); // Retorna o e-mail do usuário (o Subject)
     }
 
 }
