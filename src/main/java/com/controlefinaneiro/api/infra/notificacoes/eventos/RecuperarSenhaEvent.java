@@ -4,7 +4,6 @@ import com.controlefinaneiro.api.usuario.models.Usuario;
 
 public record RecuperarSenhaEvent(
         Usuario usuario,
-        String token,
-        String origem
+        String urlCompleta
 ) {
 }
