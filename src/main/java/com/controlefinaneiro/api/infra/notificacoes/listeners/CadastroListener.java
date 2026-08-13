@@ -2,6 +2,8 @@ package com.controlefinaneiro.api.infra.notificacoes.listeners;
 
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -12,6 +14,8 @@ import com.controlefinaneiro.api.infra.notificacoes.eventos.UsuarioCadastradoEve
 
 @Component
 public class CadastroListener {
+
+    private static final Logger log = LoggerFactory.getLogger(CadastroListener.class);
 
     //Pode seguir esse padrão para todos os eventos do sistema.
     @Autowired
@@ -29,8 +33,7 @@ public class CadastroListener {
             emailService.enviarEmail(destinatario, assunto, mensagem);
            
         } catch (Exception e) {
-            e.printStackTrace();
-            e.getMessage();
+            log.error("Falha ao processar cadastro do usuário {}: {}", evento.usuario().getEmail(), e.getMessage(), e);
         }
 
     }

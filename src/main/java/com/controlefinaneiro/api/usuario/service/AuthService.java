@@ -1,8 +1,11 @@
 package com.controlefinaneiro.api.usuario.service;
 
 
+import com.controlefinaneiro.api.infra.exceptions.OrigemInvalidaException;
 import com.controlefinaneiro.api.infra.exceptions.TokenInvalidoException;
+import com.controlefinaneiro.api.infra.exceptions.UsuarioNaoAutenticadoException;
 import com.controlefinaneiro.api.infra.notificacoes.eventos.RecuperarSenhaEvent;
+import com.controlefinaneiro.api.infra.utils.OriginValidator;
 import com.controlefinaneiro.api.usuario.models.TokenRecuperacao;
 import com.controlefinaneiro.api.usuario.repository.TokenRecuperacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,14 +85,22 @@ public class AuthService {
     public Usuario getUsuarioAutenticado(){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null || !authentication.isAuthenticated()){
-            throw new RuntimeException("Usuário não autenticado");
+            throw new UsuarioNaoAutenticadoException("Usuário não autenticado");
         }
 
         return (Usuario) authentication.getPrincipal();
     }
 
     @Transactional
-    public void solicitarRecuperacao(String email, String origem){ 
+    public void solicitarRecuperacao(String email, String origem){
+        //Valida a origem de forma síncrona (fail-fast), antes de publicar o evento assíncrono:
+        //se disparasse só dentro do listener @Async, a exceção nunca chegaria ao cliente,
+        //que já teria recebido 200 (ver RecuperaSenhaListener).
+        String urlReset = OriginValidator.validadorDeOrigem(origem);
+        if(urlReset == null){
+            throw new OrigemInvalidaException("Origem não identificada para montar o link.");
+        }
+
         Usuario usuario = usuarioRepository.findByEmail(email);
          if(usuario == null){ return ;} //Para garantir o 200 no build();
 
@@ -101,8 +112,6 @@ public class AuthService {
         //Gera token aleatorio
         String valorToken = UUID.randomUUID().toString();
 
-        //Capturar a origem...
-
         TokenRecuperacao novoToken = new TokenRecuperacao();
         novoToken.setToken(valorToken);
         novoToken.setUsuario(usuario);
@@ -110,7 +119,9 @@ public class AuthService {
 
         tokenRepository.save(novoToken);
 
-        publisher.publishEvent(new RecuperarSenhaEvent(usuario,valorToken, origem));
+        String urlCompleta = origem + urlReset + valorToken;
+
+        publisher.publishEvent(new RecuperarSenhaEvent(usuario, urlCompleta));
 
     }
 
