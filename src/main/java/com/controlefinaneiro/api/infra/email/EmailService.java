@@ -1,6 +1,8 @@
 package com.controlefinaneiro.api.infra.email;
 
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
     @Value("${spring.mail.username}")
     private String emailADM;
@@ -31,8 +35,7 @@ public class EmailService {
             mailSender.send(message);
             
         } catch (Exception e) {
-            e.printStackTrace();
-            e.getMessage();
+            log.error("Falha ao enviar e-mail para {}: {}", destinatario, e.getMessage(), e);
         }
     }
 

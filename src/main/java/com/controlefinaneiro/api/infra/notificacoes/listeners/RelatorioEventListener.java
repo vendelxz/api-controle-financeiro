@@ -6,6 +6,8 @@ import com.controlefinaneiro.api.infra.notificacoes.eventos.RelatorioSolicitadoE
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.service.RelatorioService;
 import com.controlefinaneiro.api.transacao.service.TransacaoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -15,6 +17,8 @@ import java.util.List;
 
 @Component
 public class RelatorioEventListener {
+
+    private static final Logger log = LoggerFactory.getLogger(RelatorioEventListener.class);
 
     @Autowired
     private RelatorioService relatorioService;
@@ -42,8 +46,8 @@ public class RelatorioEventListener {
             emailService.enviarEmailComAnexo(destinatario,assunto,corpo,pdf,nomeArquivo);
 
         }catch (Exception e){
-            e.printStackTrace();
-            e.getMessage();
+            log.error("Falha ao processar relatório solicitado para usuário {} ({}/{}): {}",
+                    evento.usuario().getEmail(), evento.mes(), evento.ano(), e.getMessage(), e);
         }
     }
 }

@@ -76,6 +76,27 @@ public class TratadorDeExceptions {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
       }
 
+      @ExceptionHandler(RecursoNaoEncontradoException.class)
+      public ResponseEntity<Map<String, String>> tratarNaoEncontrado(RecursoNaoEncontradoException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+      }
+
+      @ExceptionHandler(AcessoNegadoNegocioException.class)
+      public ResponseEntity<Map<String, String>> tratarAcessoNegadoNegocio(AcessoNegadoNegocioException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors);
+      }
+
+      @ExceptionHandler(UsuarioNaoAutenticadoException.class)
+      public ResponseEntity<Map<String, String>> tratarUsuarioNaoAutenticado(UsuarioNaoAutenticadoException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
+      }
+
 }
 
 
