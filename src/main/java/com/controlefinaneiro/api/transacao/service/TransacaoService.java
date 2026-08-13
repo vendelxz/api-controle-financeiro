@@ -1,6 +1,8 @@
 package com.controlefinaneiro.api.transacao.service;
 
 
+import com.controlefinaneiro.api.infra.exceptions.AcessoNegadoNegocioException;
+import com.controlefinaneiro.api.infra.exceptions.RecursoNaoEncontradoException;
 import com.controlefinaneiro.api.transacao.dtos.TransacaoDTO;
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.enums.TipoTransacao;
@@ -142,13 +144,13 @@ public class TransacaoService {
         }
     }
     private Transacao buscarEValidarDono(UUID idTransacao){
-        Transacao transacao = transacaoRepository.findById(idTransacao).orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+        Transacao transacao = transacaoRepository.findById(idTransacao).orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada"));
         //Todos os métodos estou fazendo validação interna, isso é mais seguro
         //Passar o id no body do controller é arriscado, o token já tem todas as informações do usuário ;)
         Usuario usuarioLogado = pegarUsuario();
 
         if(!transacao.getUsuario().equals(usuarioLogado)){
-            throw new RuntimeException("Acesso negado: Esta transação pertence a outro usuário.");
+            throw new AcessoNegadoNegocioException("Acesso negado: Esta transação pertence a outro usuário.");
         }
 
         return transacao;

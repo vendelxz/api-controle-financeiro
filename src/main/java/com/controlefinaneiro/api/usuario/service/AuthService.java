@@ -2,6 +2,7 @@ package com.controlefinaneiro.api.usuario.service;
 
 
 import com.controlefinaneiro.api.infra.exceptions.TokenInvalidoException;
+import com.controlefinaneiro.api.infra.exceptions.UsuarioNaoAutenticadoException;
 import com.controlefinaneiro.api.infra.notificacoes.eventos.RecuperarSenhaEvent;
 import com.controlefinaneiro.api.usuario.models.TokenRecuperacao;
 import com.controlefinaneiro.api.usuario.repository.TokenRecuperacaoRepository;
@@ -82,7 +83,7 @@ public class AuthService {
     public Usuario getUsuarioAutenticado(){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null || !authentication.isAuthenticated()){
-            throw new RuntimeException("Usuário não autenticado");
+            throw new UsuarioNaoAutenticadoException("Usuário não autenticado");
         }
 
         return (Usuario) authentication.getPrincipal();
