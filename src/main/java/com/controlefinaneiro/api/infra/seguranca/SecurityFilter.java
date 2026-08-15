@@ -8,6 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.controlefinaneiro.api.infra.seguranca.jwt.TokenService;
@@ -18,7 +20,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
@@ -40,9 +44,11 @@ public class SecurityFilter extends OncePerRequestFilter {
         //String token = this.recuperarToken(request);
         //TokenHeader para ver o Authorization correto
         var tokenHeader = request.getHeader("Authorization");
+        boolean tokenPresente = tokenHeader != null && tokenHeader.startsWith("Bearer ");
 
-        if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
+        if (!tokenPresente) {
             filterChain.doFilter(request, response);
+            logarRequisicao(request, tokenPresente);
             return;
         }
 
@@ -57,8 +63,10 @@ public class SecurityFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
+            logarRequisicao(request, tokenPresente);
 
         }catch(JWTVerificationException e){
+            log.warn("Token JWT rejeitado para path {}: {}", request.getRequestURI(), e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);// 401 para dizer que é proibido;
             return;
 
@@ -71,6 +79,16 @@ public class SecurityFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null) return null;
         return authHeader.replace("Bearer ", "");
+    }
+
+    private void logarRequisicao(HttpServletRequest request, boolean tokenPresente) {
+        Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+        String classeExecutada = (handler instanceof HandlerMethod hm)
+                ? hm.getBeanType().getSimpleName()
+                : "Desconhecida";
+
+        log.info("[SecurityFilter] path: {}, token: {}, class: {}",
+                request.getRequestURI(), tokenPresente, classeExecutada);
     }
 
 }

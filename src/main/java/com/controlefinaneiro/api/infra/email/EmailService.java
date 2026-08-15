@@ -1,8 +1,6 @@
 package com.controlefinaneiro.api.infra.email;
 
 import jakarta.mail.internet.MimeMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -10,10 +8,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class EmailService {
-
-    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
     @Value("${spring.mail.username}")
     private String emailADM;
@@ -33,7 +32,8 @@ public class EmailService {
             helper.setText(corpo);
 
             mailSender.send(message);
-            
+            log.info("E-mail enviado com sucesso para {}", destinatario);
+
         } catch (Exception e) {
             log.error("Falha ao enviar e-mail para {}: {}", destinatario, e.getMessage(), e);
         }
@@ -53,8 +53,10 @@ public class EmailService {
 
             helper.addAttachment(nomeArquivo, new ByteArrayResource(anexo));
             mailSender.send(message);
+            log.info("E-mail com anexo '{}' enviado com sucesso para {}", nomeArquivo, destinatario);
 
         }catch (Exception e){
+            log.error("Falha ao enviar e-mail com anexo para {}: {}", destinatario, e.getMessage(), e);
             throw new RuntimeException("Erro ao enviar e-mail com anexo", e);
         }
     }
