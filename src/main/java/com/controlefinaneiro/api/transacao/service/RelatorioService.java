@@ -17,6 +17,9 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class RelatorioService {
 
@@ -27,6 +30,7 @@ public class RelatorioService {
     private AuthService authService;
 
     public byte[] gerarRelatorioCompleto(List<TransacaoResponse> transacao, int mes, int ano){
+        log.info("Gerando relatório financeiro para o período {}/{}", mes, ano);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document documento = new Document(PageSize.A4);
 
@@ -95,6 +99,7 @@ public class RelatorioService {
 
             documento.close();
         }catch(Exception e){
+            log.error("Falha ao gerar relatório financeiro do período {}/{}: {}", mes, ano, e.getMessage(), e);
             throw new RuntimeException("Erro ao processar PDF: " + e.getMessage());
         }
 
@@ -106,5 +111,6 @@ public class RelatorioService {
 
         // Apenas dispara o evento e responde ao usuário imediatamente
         publisher.publishEvent(new RelatorioSolicitadoEvent(usuario, mes, ano));
+        log.info("Solicitação de relatório por e-mail registrada para {} ({}/{})", usuario.getEmail(), mes, ano);
     }
 }

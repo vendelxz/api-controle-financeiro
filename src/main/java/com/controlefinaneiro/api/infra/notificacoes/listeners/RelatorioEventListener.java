@@ -6,8 +6,6 @@ import com.controlefinaneiro.api.infra.notificacoes.eventos.RelatorioSolicitadoE
 import com.controlefinaneiro.api.transacao.dtos.TransacaoResponse;
 import com.controlefinaneiro.api.transacao.service.RelatorioService;
 import com.controlefinaneiro.api.transacao.service.TransacaoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -15,10 +13,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class RelatorioEventListener {
-
-    private static final Logger log = LoggerFactory.getLogger(RelatorioEventListener.class);
 
     @Autowired
     private RelatorioService relatorioService;
@@ -31,6 +30,8 @@ public class RelatorioEventListener {
     @Async("taskExecutor")
     @EventListener
     public void processarRelatorioSolicitado(RelatorioSolicitadoEvent evento){
+        log.info("Iniciando processamento de relatório solicitado para {} ({}/{})",
+                evento.usuario().getEmail(), evento.mes(), evento.ano());
         try {
             //busca os dados filtrados
             List<TransacaoResponse> dados = transacaoService.filtrarPorPeriodo(evento.mes(), evento.ano());
@@ -44,6 +45,8 @@ public class RelatorioEventListener {
             String nomeArquivo = "Relatorio_" + evento.mes() + "_" + evento.ano() + ".pdf";
 
             emailService.enviarEmailComAnexo(destinatario,assunto,corpo,pdf,nomeArquivo);
+            log.info("Processamento de relatório concluído para {} ({}/{})",
+                    destinatario, evento.mes(), evento.ano());
 
         }catch (Exception e){
             log.error("Falha ao processar relatório solicitado para usuário {} ({}/{}): {}",

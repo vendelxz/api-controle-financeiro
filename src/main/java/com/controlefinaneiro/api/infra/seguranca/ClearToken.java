@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 @EnableScheduling
 public class ClearToken {
@@ -21,6 +24,7 @@ public class ClearToken {
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void deletarTokenExpirados(){
+        log.info("Executando limpeza agendada de tokens de recuperação expirados");
         tokenRepository.deleteByDataExpiracaoBefore(LocalDateTime.now());
     }
 }

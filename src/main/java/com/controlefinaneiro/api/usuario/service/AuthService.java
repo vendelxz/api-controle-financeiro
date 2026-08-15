@@ -28,6 +28,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class AuthService {
 
@@ -49,6 +52,7 @@ public class AuthService {
 
     public UsuarioResponseDTO registrar(UsuarioDTO dto){
         if(usuarioRepository.existsByEmail(dto.email())){
+            log.warn("Tentativa de cadastro com e-mail já em uso: {}", dto.email());
             throw new IllegalArgumentException("Email em uso, tente outro por favor.");
         }
 
@@ -61,6 +65,8 @@ public class AuthService {
         Usuario usuarioAsalvar = UsuarioMapper.toModel(dto, senhaHash);
         Usuario usuarioSalvo = usuarioRepository.save(usuarioAsalvar);
 
+        log.info("Cadastro realizado com sucesso para {}", usuarioSalvo.getEmail());
+
         //Utilzação geral pra cadastrar um evento e disparar o e-mail
         publisher.publishEvent(new UsuarioCadastradoEvent(usuarioSalvo));
 
@@ -71,14 +77,17 @@ public class AuthService {
     public String autenticar(LoginDTO login){
         Usuario usuario = usuarioRepository.findByEmail(login.email());
         if(usuario == null){
+            log.warn("Tentativa de login com e-mail não cadastrado: {}", login.email());
             throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
         if(!passwordEncoder.matches(login.senha(), usuario.getSenha())){
+            log.warn("Tentativa de login com senha incorreta para {}", login.email());
             throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
         String token = tokenService.gerarToken(usuario);
+        log.info("Login bem-sucedido para {}", usuario.getEmail());
         return token;
     }
 
@@ -123,6 +132,7 @@ public class AuthService {
 
         publisher.publishEvent(new RecuperarSenhaEvent(usuario, urlCompleta));
 
+        log.info("Solicitação de recuperação de senha processada para {}", email);
     }
 
     @Transactional
@@ -132,6 +142,8 @@ public class AuthService {
             throw new TokenInvalidoException("Token inexistente");
         }
         if(!recuperacao.get().ehValido()){
+            log.warn("Tentativa de redefinição de senha com token inválido ou expirado para o usuário {}",
+                    recuperacao.get().getUsuario().getEmail());
             throw new TokenInvalidoException("Token expirado ou já utilizado");
         }
 
@@ -144,5 +156,6 @@ public class AuthService {
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
 
+        log.info("Senha redefinida com sucesso para {}", usuario.getEmail());
     }
 }
