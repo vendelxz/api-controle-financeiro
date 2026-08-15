@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class TransacaoService {
 
@@ -39,6 +42,8 @@ public class TransacaoService {
 
         Transacao transacaoASalvar = TransacaoMapper.toEntity(transacaoDTO, usuario);
         Transacao salva = transacaoRepository.save(transacaoASalvar);
+
+        log.info("Transação criada com sucesso: id={}, tipo={}, valor={}", salva.getId(), salva.getTipo(), salva.getValor());
 
         TransacaoResponse reposta = TransacaoMapper.toResponse(salva);
 
@@ -59,13 +64,17 @@ public class TransacaoService {
         transacao.setDescricao(transacaoDTO.descricao());
         transacao.setMetodoPagamento(transacaoDTO.metodoPagamento());
 
-        return TransacaoMapper.toResponse(transacaoRepository.save(transacao));
+        Transacao atualizada = transacaoRepository.save(transacao);
+        log.info("Transação atualizada com sucesso: id={}", atualizada.getId());
+
+        return TransacaoMapper.toResponse(atualizada);
     }
 
     @Transactional
     public void deletar(UUID id) {
         buscarEValidarDono(id);
         transacaoRepository.deleteById(id);
+        log.info("Transação deletada com sucesso: id={}", id);
     }
 
     public List<TransacaoResponse> filtrarPorPeriodo( int mes, int ano){
@@ -144,12 +153,16 @@ public class TransacaoService {
         }
     }
     private Transacao buscarEValidarDono(UUID idTransacao){
-        Transacao transacao = transacaoRepository.findById(idTransacao).orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada"));
+        Transacao transacao = transacaoRepository.findById(idTransacao).orElseThrow(() -> {
+            log.warn("Tentativa de acesso à transação inexistente: id={}", idTransacao);
+            return new RecursoNaoEncontradoException("Transação não encontrada");
+        });
         //Todos os métodos estou fazendo validação interna, isso é mais seguro
         //Passar o id no body do controller é arriscado, o token já tem todas as informações do usuário ;)
         Usuario usuarioLogado = pegarUsuario();
 
         if(!transacao.getUsuario().equals(usuarioLogado)){
+            log.warn("Acesso negado: usuário {} tentou acessar transação {} de outro usuário", usuarioLogado.getId(), idTransacao);
             throw new AcessoNegadoNegocioException("Acesso negado: Esta transação pertence a outro usuário.");
         }
 

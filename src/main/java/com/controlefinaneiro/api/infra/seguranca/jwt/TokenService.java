@@ -10,8 +10,12 @@ import org.springframework.stereotype.Service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.controlefinaneiro.api.usuario.models.Usuario;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class TokenService {
 
@@ -29,7 +33,7 @@ public class TokenService {
                     .sign(algoritmo); // Assina e finaliza a criação
 
         }catch(JWTCreationException e){
-            e.printStackTrace();
+            log.error("Falha ao gerar token JWT para o usuário {}: {}", usuario.getEmail(), e.getMessage(), e);
             throw new RuntimeException("Erro ao gerar o token JWT: "+ e.getMessage());
         }
     }
@@ -41,11 +45,16 @@ public class TokenService {
     public String validarToken(String token){
         Algorithm algoritmo = Algorithm.HMAC256(secret);
 
-        return JWT.require(algoritmo)
-                .withIssuer("API Controle Financeiro") // Verifica se fomos nós que emitimos
-                .build()
-                .verify(token) // Valida a assinatura e a expiração
-                .getSubject(); // Retorna o e-mail do usuário (o Subject)
+        try{
+            return JWT.require(algoritmo)
+                    .withIssuer("API Controle Financeiro") // Verifica se fomos nós que emitimos
+                    .build()
+                    .verify(token) // Valida a assinatura e a expiração
+                    .getSubject(); // Retorna o e-mail do usuário (o Subject)
+        }catch(JWTVerificationException e){
+            log.warn("Token JWT inválido ou expirado: {}", e.getMessage());
+            throw e;
+        }
     }
 
 }
