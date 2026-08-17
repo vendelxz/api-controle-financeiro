@@ -33,10 +33,9 @@ build/
 .vscode/
 
 ##Segredos
-/src/main/resources/application.properties
-application.properties
 *.db
 run.ps1
+.env
 
 ## Claude Code
 /docs
